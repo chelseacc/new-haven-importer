@@ -51,20 +51,21 @@ def main():
     recipients_table = Airtable(airtable_base_backline, 'Recipients', api_key=airtable_api_key)
     restaurants_table = Airtable(airtable_base_backline, 'Restaurants', api_key=airtable_api_key)
 
-    # Airtable column names
-    airtable_fieldnames = ["Chapter", "Recipient", "Floor", "Day of Hospital Contact", "Hospital Contact Phone",
-                           "day_one", "restaurant_one", "meals_number_one",
-                           "day_two", "restaurant_two", "meals_number_two"]
-                           # "day_three", "restaurant_three", "meals_number_three",
-                           # "day_four", "restaurant_four", "meals_number_four",
-                           # "day_five", "restaurant_five", "meals_number_five",
-                           # "day_six", "restaurant_six", "meals_number_six",
-                           # "day_seven", "restaurant_seven", "meals_number_seven"]
+#    # Airtable column names
+#    airtable_fieldnames = ["Chapter", "Recipient", "Floor", "Day of Hospital Contact", "Hospital Contact Phone",
+#                           "day_one", "restaurant_one", "meals_number_one",
+#                           "day_two", "restaurant_two", "meals_number_two"]
+#                           # "day_three", "restaurant_three", "meals_number_three",
+#                           # "day_four", "restaurant_four", "meals_number_four",
+#                           # "day_five", "restaurant_five", "meals_number_five",
+#                           # "day_six", "restaurant_six", "meals_number_six",
+#                           # "day_seven", "restaurant_seven", "meals_number_seven"]
 
     # read CSV
     with open(args.csv, newline='') as csvfile:
-        next(csvfile, None)  # skip csv header
-        reader = csv.DictReader(csvfile, fieldnames=airtable_fieldnames)
+        reader = csv.DictReader(csvfile)
+        print(reader.keys)
+exit 0
         for row in reader:
             common = {}
             one = {}
