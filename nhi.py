@@ -64,8 +64,8 @@ def main():
     # read CSV
     with open(args.csv, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
-        print(reader.keys)
-exit 0
+        print(reader.fieldnames)
+        exit(0)
         for row in reader:
             common = {}
             one = {}
