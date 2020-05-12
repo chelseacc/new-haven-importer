@@ -1,3 +1,6 @@
+# data
+*.csv
+
 # secrets
 env.sh
 
