@@ -55,13 +55,9 @@ def fieldnames_parse(names):
     dates_m = []
     for name in names:
         if name.endswith(' restaurants'):
-            date = datetime.strptime(name, '%m/%d/%y restaurants').strftime("%Y-%m-%d")
-            print("{} = {}".format(name, date))
-            dates_r.append(date)
+            dates_r.append(name.replace(' restaurants', ''))
         if name.endswith(' meals'):
-            date = datetime.strptime(name, '%m/%d/%y meals').strftime("%Y-%m-%d")
-            print("{} = {}".format(name, date))
-            dates_m.append(date)
+            dates_m.append(name.replace(' meals', ''))
 
     # confirm that all columnsets have both 'restaurants' and 'meals'
     dates_r.sort()
@@ -69,8 +65,14 @@ def fieldnames_parse(names):
     if dates_r != dates_m:
             raise FatalError("Missing Restaurants or Meal column(s).")
 
-    # return array of dates representing columnsets
-    return []
+    # confirm all dates parse properly
+    iso_date = {}
+    for date in dates_r:
+        iso_date[date] = datetime.strptime(date, '%m/%d/%y').strftime('%Y-%m-%d')
+
+    # return dict of {date:iso_date} representing columnsets
+    print(iso_date)
+    return iso_date
 
 def main():
     try:
