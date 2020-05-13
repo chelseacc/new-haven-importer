@@ -45,14 +45,30 @@ def fieldnames_parse(names):
     proto_names = ['chapter', 'recipient', 'floor', 'delivery location', 'contact person', 'contact number', 'time']
 
     # set up case-insensitive compare
-    names = [name.lower() for name in names]
-    print(names);
+    names = [name.strip().lower() for name in names]
     for name in proto_names:
         if name not in names:
             raise FatalError("Required column '{}' not found.".format(name.title()))
 
     # find all the date fields and create columnsets
-        # confirm that this columnset has both 'restaurants' and 'meals'
+    dates_r = []
+    dates_m = []
+    for name in names:
+        if name.endswith(' restaurants'):
+            date = datetime.strptime(name, '%m/%d/%y restaurants').strftime("%Y-%m-%d")
+            print("{} = {}".format(name, date))
+            dates_r.append(date)
+        if name.endswith(' meals'):
+            date = datetime.strptime(name, '%m/%d/%y meals').strftime("%Y-%m-%d")
+            print("{} = {}".format(name, date))
+            dates_m.append(date)
+
+    # confirm that all columnsets have both 'restaurants' and 'meals'
+    dates_r.sort()
+    dates_m.sort()
+    if dates_r != dates_m:
+            raise FatalError("Missing Restaurants or Meal column(s).")
+
     # return array of dates representing columnsets
     return []
 
