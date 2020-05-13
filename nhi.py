@@ -34,12 +34,6 @@ def format_datetime_Y(original_datetime):
     return converted
 
 
-# def format_datetime_y(original_datetime):
-#     formatted = datetime.strptime(original_datetime, '%m/%d/%y %I:%M%p')
-#     converted = formatted.strftime("%Y-%m-%d" + "T" + "%H:%M:%S.%f")[:-3] + "Z"
-#     return converted
-
-
 def fieldnames_parse(names):
     # Sample columns
     # ['Chapter', 'Recipient', 'Floor', 'Delivery Location', 'CONTACT PERSON', 'CONTACT NUMBER', 'Time', '5/27/20 Restaurants', '5/27/20 Meals']
@@ -89,7 +83,7 @@ def main():
         # set up Airtable connections
         deliveries_table = Airtable(airtable_base_backline, 'Deliveries', api_key=airtable_api_key)
         chapters_table = Airtable(airtable_base_backline, 'Chapters', api_key=airtable_api_key)
-        # delivery_locations_table = Airtable(airtable_base_backline, 'Delivery Locations', api_key=airtable_api_key)
+        delivery_locations_table = Airtable(airtable_base_backline, 'Delivery Locations', api_key=airtable_api_key)
         recipients_table = Airtable(airtable_base_backline, 'Recipients', api_key=airtable_api_key)
         restaurants_table = Airtable(airtable_base_backline, 'Restaurants', api_key=airtable_api_key)
 
@@ -100,60 +94,53 @@ def main():
             for row in reader:
                 common = {
                     'Chapter': chapters_table.match('Name', row['Chapter']).get('id'),
-                    'Delivery Location': delivery_locations_table.match('Name', row['Delivery Location']).get('id'),
                     'Recipient': recipients_table.match('Name', row['Recipient']).get('id'),
                     'Floor': row['Floor'],
+                    'Delivery Location': delivery_locations_table.match('Name', row['Delivery Location']).get('id'),
                     'Day of Hospital Contact': row['CONTACT PERSON'],
                     'Hospital Contact Phone': row['CONTACT NUMBER'],
                 }
-
-                for date, iso_date in iso_dates:
+                clean_time = row['Time'].replace(" ", "")
+                for date, iso_date in iso_dates.items():
                     print( "{}, {}".format(date, iso_date) )
-#                    print( 'Delivery Scheduled': "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
-                    print( "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
+                    print("{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")))
+                    # print( 'Delivery Scheduled': "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
+                    # print( "{}T{}.000Z".format(iso_date, row['Time']).strftime("%H:%M"))
                     print( row[date + ' Restaurants'] )
                     print( row[date + ' Meals'] )
+
 
                 ## BOOKMARK ##
                 raise FatalError("debug stop")
 
-                one = {}
-                two = {}
-                # three = {}
-                # four = {}
-                # five = {}
-                # six = {}
-                # seven = {}
-                chapter_id = chapters_table.match('Name', row['Chapter']).get('id')  # record ID of New Haven Chapter
-                for k, v in row.items():
-                    v = v.strip()
-                    if not k.startswith(('day', 'restaurant', 'meals_number')):
-                        if k == 'Chapter':
-                            common[k] = [chapter_id or v]
-                        elif k == 'Recipient':
-                            if v == 'Yale New Haven Hospital - SRC':
-                                v = 'Yale New Haven Hospital St Raphael Campus'
-                            common[k] = [recipients_table.match('Name', v).get('id')]
-                        # elif k == 'Delivery Location':
-                        #     common[k] = [delivery_locations_table.match('Name', v).get('id')]
-                        else:
-                            common[k] = v
-                    # Monday
-                    elif k.endswith('one'):
-                        if row['day_one']:
-                            one['Delivery Scheduled'] = format_datetime_Y(row['day_one'])
-                            # if v == 'Roia Restaurant':
-                            #     row["restaurant_one"] = 'ROIA Restaurant'
-                            one['Restaurant'] = [restaurants_table.match('Name', row["restaurant_one"]).get('id')]
-                            one['Number of Meals'] = int(row["meals_number_one"])
-                    # Tuesday
-                    elif k.endswith('two'):
-                        if row['day_two']:
-                            two['Delivery Scheduled'] = format_datetime_Y(row['day_two'])
-                            # if v == 'Roia Restaurant':
-                            #     row["restaurant_two"] = 'ROIA Restaurant'
-                            two['Restaurant'] = [restaurants_table.match('Name', row["restaurant_two"]).get('id')]
-                            two['Number of Meals'] = int(row['meals_number_two'])
+                # chapter_id = chapters_table.match('Name', row['Chapter']).get('id')  # record ID of New Haven Chapter
+                # for k, v in row.items():
+                #     v = v.strip()
+                #     if not k.startswith(('day', 'restaurant', 'meals_number')):
+                #         if k == 'Chapter':
+                #             common[k] = [chapter_id or v]
+                #         elif k == 'Recipient':
+                #             if v == 'Yale New Haven Hospital - SRC':
+                #                 v = 'Yale New Haven Hospital St Raphael Campus'
+                #             common[k] = [recipients_table.match('Name', v).get('id')]
+                #         else:
+                #             common[k] = v
+                #     # Monday
+                #     elif k.endswith('one'):
+                #         if row['day_one']:
+                #             one['Delivery Scheduled'] = format_datetime_Y(row['day_one'])
+                #             # if v == 'Roia Restaurant':
+                #             #     row["restaurant_one"] = 'ROIA Restaurant'
+                #             one['Restaurant'] = [restaurants_table.match('Name', row["restaurant_one"]).get('id')]
+                #             one['Number of Meals'] = int(row["meals_number_one"])
+                #     # Tuesday
+                #     elif k.endswith('two'):
+                #         if row['day_two']:
+                #             two['Delivery Scheduled'] = format_datetime_Y(row['day_two'])
+                #             # if v == 'Roia Restaurant':
+                #             #     row["restaurant_two"] = 'ROIA Restaurant'
+                #             two['Restaurant'] = [restaurants_table.match('Name', row["restaurant_two"]).get('id')]
+                #             two['Number of Meals'] = int(row['meals_number_two'])
                     # # Wednesday
                     # elif k.endswith('three'):
                     #     three['Delivery Scheduled'] = format_datetime_y(
@@ -200,17 +187,17 @@ def main():
                     #     seven['Restaurant'] = [restaurants_table.match('Name', row["restaurant_seven"]).get('id')]
                     #     seven['Number of Meals'] = int(row['meals_number_seven'])
 
-                final_delivery_row_1 = {}
-                final_delivery_row_1.update(common)
-                final_delivery_row_1.update(one)
+                # final_delivery_row_1 = {}
+                # final_delivery_row_1.update(common)
+                # final_delivery_row_1.update(one)
                 # final_delivery_row_1.pop('empty')
-                deliveries_table.insert(final_delivery_row_1)  # insert delivery_row_1 to Airtable
+                # deliveries_table.insert(final_delivery_row_1)  # insert delivery_row_1 to Airtable
 
-                final_delivery_row_2 = {}
-                final_delivery_row_2.update(common)
-                final_delivery_row_2.update(two)
+                # final_delivery_row_2 = {}
+                # final_delivery_row_2.update(common)
+                # final_delivery_row_2.update(two)
                 # final_delivery_row_2.pop('empty')
-                deliveries_table.insert(final_delivery_row_2)  # insert delivery_row_2 to Airtable
+                # deliveries_table.insert(final_delivery_row_2)  # insert delivery_row_2 to Airtable
 
                 # final_delivery_row_3 = {}
                 # final_delivery_row_3.update(common)
@@ -245,6 +232,7 @@ def main():
     except FatalError as err:
         print("\n\nFatal error, exiting: {}\n".format(err));
         sys.exit(1)
+
 
 # Run this script
 if __name__ == "__main__":
