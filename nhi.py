@@ -102,13 +102,21 @@ def main():
                 }
                 clean_time = row['Time'].replace(" ", "")
                 for date, iso_date in iso_dates.items():
-                    print( "{}, {}".format(date, iso_date) )
+                    print("{}, {}".format(date, iso_date))
                     print("{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")))
                     # print( 'Delivery Scheduled': "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
                     # print( "{}T{}.000Z".format(iso_date, row['Time']).strftime("%H:%M"))
-                    print( row[date + ' Restaurants'] )
-                    print( row[date + ' Meals'] )
-
+                    print(row[date + ' Restaurants'])
+                    print(row[date + ' Meals'])
+                    unique = {
+                        'Delivery Scheduled': "{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")),
+                        'Restaurant': restaurants_table.match('Name', row[date + ' Restaurants']).get('id'),
+                        'Number of Meals': row[date + ' Meals']
+                    }
+                    delivery_row = {}
+                    delivery_row.update(common)
+                    delivery_row.update(unique)
+                    print(delivery_row)
 
                 ## BOOKMARK ##
                 raise FatalError("debug stop")
