@@ -93,10 +93,10 @@ def main():
             iso_dates = fieldnames_parse(reader.fieldnames)
             for row in reader:
                 common = {
-                    'Chapter': chapters_table.match('Name', row['Chapter']).get('id'),
-                    'Recipient': recipients_table.match('Name', row['Recipient']).get('id'),
+                    'Chapter': [chapters_table.match('Name', row['Chapter']).get('id')],
+                    'Recipient': [recipients_table.match('Name', row['Recipient']).get('id')],
                     'Floor': row['Floor'],
-                    'Delivery Location': delivery_locations_table.match('Name', row['Delivery Location']).get('id'),
+                    'Delivery Location': [delivery_locations_table.match('Name', row['Delivery Location']).get('id')],
                     'Day of Hospital Contact': row['CONTACT PERSON'],
                     'Hospital Contact Phone': row['CONTACT NUMBER'],
                 }
@@ -110,7 +110,7 @@ def main():
                     print(row[date + ' Meals'])
                     unique = {
                         'Delivery Scheduled': "{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")),
-                        'Restaurant': restaurants_table.match('Name', row[date + ' Restaurants']).get('id'),
+                        'Restaurant': [restaurants_table.match('Name', row[date + ' Restaurants']).get('id')],
                         'Number of Meals': row[date + ' Meals']
                     }
                     delivery_row = {}
