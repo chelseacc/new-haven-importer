@@ -118,6 +118,7 @@ def main():
                         delivery_row.update(common)
                         delivery_row.update(unique)
                         print(delivery_row)
+                        deliveries_table.insert(delivery_row)
                     else:
                         raise FatalError("missing Restaurants/Meals on {} at {} for {}, floor: {}.".format(date, clean_time, row['Recipient'], row['Floor']))
 
