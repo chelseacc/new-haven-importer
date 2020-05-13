@@ -112,7 +112,7 @@ def main():
                         unique = {
                             'Delivery Scheduled': "{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")),
                             'Restaurant': [restaurants_table.match('Name', row[date + ' Restaurants']).get('id')],
-                            'Number of Meals': row[date + ' Meals']
+                            'Number of Meals': int(row[date + ' Meals'])
                         }
                         delivery_row = {}
                         delivery_row.update(common)
