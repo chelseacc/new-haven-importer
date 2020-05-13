@@ -41,6 +41,9 @@ def format_datetime_Y(original_datetime):
 
 
 def fieldnames_parse(names):
+    # Sample columns
+    # ['Chapter', 'Recipient', 'Floor', 'Delivery Location', 'CONTACT PERSON', 'CONTACT NUMBER', 'Time', '5/27/20 Restaurants', '5/27/20 Meals']
+
     # check all our static fields are there
     proto_names = ['chapter', 'recipient', 'floor', 'delivery location', 'contact person', 'contact number', 'time']
 
@@ -66,13 +69,12 @@ def fieldnames_parse(names):
             raise FatalError("Missing Restaurants or Meal column(s).")
 
     # confirm all dates parse properly
-    iso_date = {}
+    iso_dates = {}
     for date in dates_r:
-        iso_date[date] = datetime.strptime(date, '%m/%d/%y').strftime('%Y-%m-%d')
+        iso_dates[date] = datetime.strptime(date, '%m/%d/%y').strftime('%Y-%m-%d')
 
     # return dict of {date:iso_date} representing columnsets
-    print(iso_date)
-    return iso_date
+    return iso_dates
 
 def main():
     try:
@@ -91,16 +93,30 @@ def main():
         recipients_table = Airtable(airtable_base_backline, 'Recipients', api_key=airtable_api_key)
         restaurants_table = Airtable(airtable_base_backline, 'Restaurants', api_key=airtable_api_key)
 
-        # Design columns
-        # ['Chapter', 'Recipient', 'Floor', 'Delivery Location', 'CONTACT PERSON', 'CONTACT NUMBER', 'Time', '5/27/20 Restaurants', '5/27/20 Meals']
-
         # read CSV
         with open(args.csv, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            dates = fieldnames_parse(reader.fieldnames)
-            raise FatalError("debugging stop")
+            iso_dates = fieldnames_parse(reader.fieldnames)
             for row in reader:
-                common = {}
+                common = {
+                    'Chapter': chapters_table.match('Name', row['Chapter']).get('id'),
+                    'Delivery Location': delivery_locations_table.match('Name', row['Delivery Location']).get('id'),
+                    'Recipient': recipients_table.match('Name', row['Recipient']).get('id'),
+                    'Floor': row['Floor'],
+                    'Day of Hospital Contact': row['CONTACT PERSON'],
+                    'Hospital Contact Phone': row['CONTACT NUMBER'],
+                }
+
+                for date, iso_date in iso_dates:
+                    print( "{}, {}".format(date, iso_date) )
+#                    print( 'Delivery Scheduled': "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
+                    print( "{}T{}.000Z".format(iso_date, row('Time').strftime("%H:%M")) )
+                    print( row[date + ' Restaurants'] )
+                    print( row[date + ' Meals'] )
+
+                ## BOOKMARK ##
+                raise FatalError("debug stop")
+
                 one = {}
                 two = {}
                 # three = {}
