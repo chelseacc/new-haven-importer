@@ -108,15 +108,18 @@ def main():
                     # print( "{}T{}.000Z".format(iso_date, row['Time']).strftime("%H:%M"))
                     print(row[date + ' Restaurants'])
                     print(row[date + ' Meals'])
-                    unique = {
-                        'Delivery Scheduled': "{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")),
-                        'Restaurant': [restaurants_table.match('Name', row[date + ' Restaurants']).get('id')],
-                        'Number of Meals': row[date + ' Meals']
-                    }
-                    delivery_row = {}
-                    delivery_row.update(common)
-                    delivery_row.update(unique)
-                    print(delivery_row)
+                    if row[date + ' Restaurants'] and row[date + ' Meals']:
+                        unique = {
+                            'Delivery Scheduled': "{}T{}.000Z".format(iso_date, datetime.strptime(clean_time, '%I:%M%p').strftime("%H:%M:%S")),
+                            'Restaurant': [restaurants_table.match('Name', row[date + ' Restaurants']).get('id')],
+                            'Number of Meals': row[date + ' Meals']
+                        }
+                        delivery_row = {}
+                        delivery_row.update(common)
+                        delivery_row.update(unique)
+                        print(delivery_row)
+                    else:
+                        raise FatalError("missing Restaurants/Meals on {} at {} for {}, floor: {}.".format(date, clean_time, row['Recipient'], row['Floor']))
 
                 ## BOOKMARK ##
                 raise FatalError("debug stop")
